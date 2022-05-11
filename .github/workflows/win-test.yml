@@ -18,10 +18,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: Get code
+      - name: Make package
         run: git clone https://github.com/apache/iotdb.git; `
           cd iotdb; `
-          git checkout addConfigNode2
-      - name: Make package
-        run: mvn clean package -pl distribution -am -DskipTests`
+          git checkout addConfigNode2; `
+          mvn clean package -pl distribution -am -DskipTests
 
