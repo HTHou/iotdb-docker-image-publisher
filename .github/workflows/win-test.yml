@@ -7,8 +7,8 @@ on:
 
 jobs:
 
-  build-win:
-    runs-on: windows-latest
+  build:
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
