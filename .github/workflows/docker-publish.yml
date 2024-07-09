@@ -22,10 +22,11 @@ jobs:
           git clone https://github.com/apache/iotdb.git
           cd iotdb
           git checkout v1.3.2
+          ./do-docker-build.sh -t all -v 1.3.2 -c aa0ff4adf2fe00368b2145dd5f561d30df06a885 -b
           sed -i 's/  && mv \${target} iotdb/# \&\& mv \${target} iotdb/' docker/src/main/Dockerfile-1.0.0-datanode
           sed -i 's/#  \&\& mv apache-iotdb-\${version}-server-bin iotdb/  \&\& mv apache-iotdb-\${version}-server-bin iotdb/' docker/src/main/Dockerfile-1.0.0-datanode
           cat docker/src/main/Dockerfile-1.0.0-datanode
           cd docker/src/main/DockerCompose
-          ./do-docker-build.sh -t all -v 1.3.2 -c aa0ff4adf2fe00368b2145dd5f561d30df06a885 -b -p
+          ./do-docker-build.sh -t all -v 1.3.2 -c aa0ff4adf2fe00368b2145dd5f561d30df06a885 -p
           
 
