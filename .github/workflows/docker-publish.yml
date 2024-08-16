@@ -25,7 +25,14 @@ jobs:
           sed -i 's/  && mv \${target} iotdb/# \&\& mv \${target} iotdb/' docker/src/main/Dockerfile-1.0.0-datanode
           sed -i 's/#  \&\& mv apache-iotdb-\${version}-server-bin iotdb/  \&\& mv apache-iotdb-\${version}-server-bin iotdb/' docker/src/main/Dockerfile-1.0.0-datanode
           cat docker/src/main/Dockerfile-1.0.0-datanode
-          cd docker/src/main/DockerCompose
-          ./do-docker-build.sh -t all -v 1.3.2 -c aa0ff4adf2fe00368b2145dd5f561d30df06a885 -b -p
+          cd docker/src/main
+          mkdir target
+          cd target
+          wget https://dlcdn.apache.org/iotdb/1.3.2/apache-iotdb-1.3.2-all-bin.zip
+          wget https://dlcdn.apache.org/iotdb/1.3.2/apache-iotdb-1.3.2-confignode-bin.zip
+          wget https://dlcdn.apache.org/iotdb/1.3.2/apache-iotdb-1.3.2-datanode-bin.zip
+          cd ../DockerCompose
+          sed -i 's/ docker run --rm --privileged tonistiigi /# docker run --rm --privileged tonistiigi /' do-docker-build.sh
+          ./do-docker-build.sh -t all -v 1.3.2 -p
           
 
