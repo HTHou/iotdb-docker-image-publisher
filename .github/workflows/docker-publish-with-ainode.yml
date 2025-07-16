@@ -16,19 +16,12 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-
       - name: Make package
         run: | 
           git clone https://github.com/apache/iotdb.git
           cd iotdb
           git checkout ain-docker
-          cd docker/src/main
-          mkdir target
-          cd target
-#          wget https://dlcdn.apache.org/iotdb/2.0.4/apache-iotdb-2.0.4-all-bin.zip
-#          wget https://dlcdn.apache.org/iotdb/2.0.4/apache-iotdb-2.0.4-confignode-bin.zip
-#          wget https://dlcdn.apache.org/iotdb/2.0.4/apache-iotdb-2.0.4-datanode-bin.zip
-          cd ../DockerCompose
+          cd docker/src/main/DockerCompose
           sed -i 's/ docker run --rm --privileged tonistiigi/# docker run --rm --privileged tonistiigi/' do-docker-build.sh
           sed -i 's/--platform=$TARGETPLATFORM//g' do-docker-build.sh
           ./do-docker-build.sh -t ainode -v 2.0.5-SNAPSHOT -b -p
