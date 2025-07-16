@@ -16,7 +16,7 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      
+
       - name: Make package
         run: | 
           git clone https://github.com/apache/iotdb.git
