@@ -20,10 +20,13 @@ jobs:
         run: | 
           git clone https://github.com/apache/iotdb.git
           cd iotdb
-          git checkout ain-docker
-          cd docker/src/main/DockerCompose
+          cd docker/src/main
+          mkdir target
+          cd target
+          wget https://dlcdn.apache.org/iotdb/2.0.5/apache-iotdb-2.0.5-ainode-bin.zip
+          cd ../DockerCompose
           sed -i 's/ docker run --rm --privileged tonistiigi/# docker run --rm --privileged tonistiigi/' do-docker-build.sh
           sed -i 's/--platform=$TARGETPLATFORM//g' do-docker-build.sh
-          ./do-docker-build.sh -t ainode -v 2.0.5-SNAPSHOT -b -p
+          ./do-docker-build.sh -t ainode -v 2.0.5 -b -p
           
 
