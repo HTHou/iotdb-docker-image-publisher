@@ -33,6 +33,5 @@ jobs:
           sed -i 's/ docker run --rm --privileged tonistiigi/# docker run --rm --privileged tonistiigi/' do-docker-build.sh
           sed -i 's/--platform=$TARGETPLATFORM//g' do-docker-build.sh
           ./do-docker-build.sh -t all -v 2.0.5 -p
-          ./do-docker-build.sh -t ainode -v 2.0.5 -p
           
 
