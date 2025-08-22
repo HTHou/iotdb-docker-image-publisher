@@ -21,6 +21,7 @@ jobs:
         run: | 
           git clone https://github.com/apache/iotdb.git
           cd iotdb
+          git checkout v2.0.5
           cd docker/src/main
           mkdir target
           cd target
