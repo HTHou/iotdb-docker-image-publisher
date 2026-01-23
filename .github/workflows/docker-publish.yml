@@ -21,17 +21,18 @@ jobs:
         run: | 
           git clone https://github.com/apache/iotdb.git
           cd iotdb
-          git checkout v2.0.5
+          git checkout v2.0.6
           cd docker/src/main
           mkdir target
           cd target
-          wget https://dlcdn.apache.org/iotdb/2.0.5/apache-iotdb-2.0.5-all-bin.zip
-          wget https://dlcdn.apache.org/iotdb/2.0.5/apache-iotdb-2.0.5-confignode-bin.zip
-          wget https://dlcdn.apache.org/iotdb/2.0.5/apache-iotdb-2.0.5-datanode-bin.zip
-          wget https://dlcdn.apache.org/iotdb/2.0.5/apache-iotdb-2.0.5-ainode-bin.zip
+          wget https://dlcdn.apache.org/iotdb/2.0.6/apache-iotdb-2.0.6-all-bin.zip
+          wget https://dlcdn.apache.org/iotdb/2.0.6/apache-iotdb-2.0.6-confignode-bin.zip
+          wget https://dlcdn.apache.org/iotdb/2.0.6/apache-iotdb-2.0.6-datanode-bin.zip
           cd ../DockerCompose
           sed -i 's/ docker run --rm --privileged tonistiigi/# docker run --rm --privileged tonistiigi/' do-docker-build.sh
           sed -i 's/--platform=$TARGETPLATFORM//g' do-docker-build.sh
-          ./do-docker-build.sh -t all -v 2.0.5 -p
+          ./do-docker-build.sh -t confignode -v 2.0.6 -p
+          ./do-docker-build.sh -t datanode -v 2.0.6 -p
+          ./do-docker-build.sh -t standalone -v 2.0.6 -p
           
 

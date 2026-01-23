@@ -25,12 +25,12 @@ jobs:
           cd docker/src/main
           mkdir target
           cd target
-          wget https://dlcdn.apache.org/iotdb/1.3.5/apache-iotdb-1.3.5-all-bin.zip
-          wget https://dlcdn.apache.org/iotdb/1.3.5/apache-iotdb-1.3.5-confignode-bin.zip
-          wget https://dlcdn.apache.org/iotdb/1.3.5/apache-iotdb-1.3.5-datanode-bin.zip
+          wget https://dlcdn.apache.org/iotdb/1.3.6/apache-iotdb-1.3.6-all-bin.zip
+          wget https://dlcdn.apache.org/iotdb/1.3.6/apache-iotdb-1.3.6-confignode-bin.zip
+          wget https://dlcdn.apache.org/iotdb/1.3.6/apache-iotdb-1.3.6-datanode-bin.zip
           cd ../DockerCompose
           sed -i 's/ docker run --rm --privileged tonistiigi/# docker run --rm --privileged tonistiigi/' do-docker-build.sh
           sed -i 's/--platform=$TARGETPLATFORM//g' do-docker-build.sh
-          ./do-docker-build.sh -t confignode -v 1.3.5 -p
-          ./do-docker-build.sh -t datanode -v 1.3.5 -p
-          ./do-docker-build.sh -t standalone -v 1.3.5 -p
+          ./do-docker-build.sh -t confignode -v 1.3.6 -p
+          ./do-docker-build.sh -t datanode -v 1.3.6 -p
+          ./do-docker-build.sh -t standalone -v 1.3.6 -p
