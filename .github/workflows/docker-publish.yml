@@ -30,8 +30,6 @@ jobs:
           mkdir target
           cd target
           wget https://dlcdn.apache.org/iotdb/2.0.11/apache-iotdb-2.0.11-all-bin.zip
-          wget https://dlcdn.apache.org/iotdb/2.0.11/apache-iotdb-2.0.11-confignode-bin.zip
-          wget https://dlcdn.apache.org/iotdb/2.0.11/apache-iotdb-2.0.11-datanode-bin.zip
           cd ../DockerCompose
           sed -i 's/ docker run --rm --privileged tonistiigi/# docker run --rm --privileged tonistiigi/' do-docker-build.sh
           ./do-docker-build.sh -t confignode -v 2.0.11 -p

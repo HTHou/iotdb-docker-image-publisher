@@ -20,16 +20,17 @@
 diff --git a/docker/src/main/DockerCompose/do-docker-build.sh b/docker/src/main/DockerCompose/do-docker-build.sh
 --- a/docker/src/main/DockerCompose/do-docker-build.sh
 +++ b/docker/src/main/DockerCompose/do-docker-build.sh
-@@ -84,7 +84,7 @@
+@@ -84,8 +84,8 @@
          local image="${image_prefix}:${version}-$1"
      fi
      cd ${current_path}/../
 -    ${docker_build} -f ${dockerfile} \
-+    ${docker_build} --pull -f ${dockerfile} \
 -	    --build-arg version=${version} \
++    ${docker_build} --pull -f ${dockerfile} \
 +        --build-arg version=${version} \
          --label build_date="${build_date}" \
          --label maintainer="${maintainer}" \
+         --label commit_id="${commit_id}" \
 @@ -106,12 +106,9 @@
              docker buildx create --name mybuilder --driver docker-container --bootstrap --use
              docker run --rm --privileged tonistiigi/binfmt:latest --install all
@@ -43,6 +44,19 @@ diff --git a/docker/src/main/DockerCompose/do-docker-build.sh b/docker/src/main/
      fi
  }
  function build_iotdb(){
+@@ -147,10 +144,10 @@
+     prepare_buildx
+     case "$build_what" in
+         confignode)
+-            process_single
++            process_single all
+             ;;
+         datanode)
+-            process_single
++            process_single all
+             ;;
+         ainode)
+             process_single all
 diff --git a/docker/src/main/Dockerfile-1.0.0-confignode b/docker/src/main/Dockerfile-1.0.0-confignode
 --- a/docker/src/main/Dockerfile-1.0.0-confignode
 +++ b/docker/src/main/Dockerfile-1.0.0-confignode
@@ -53,7 +67,8 @@ diff --git a/docker/src/main/Dockerfile-1.0.0-confignode b/docker/src/main/Docke
 -FROM eclipse-temurin:17-jre-focal
 +FROM ubuntu:22.04
  ARG version=1.0.0
- ARG target=apache-iotdb-${version}-confignode-bin
+-ARG target=apache-iotdb-${version}-confignode-bin
++ARG target=apache-iotdb-${version}-all-bin
 +ENV JAVA_HOME=/opt/java/openjdk LANG=C.UTF-8
 
 -RUN apt update \
@@ -63,7 +78,7 @@ diff --git a/docker/src/main/Dockerfile-1.0.0-confignode b/docker/src/main/Docke
 -  && apt clean -y
 +# Require the first Jammy OpenJDK 17 update that fixes CVE-2026-114938.
 +RUN apt-get update \
-+  && DEBIAN_FRONTEND=noninteractive apt-get install -y openjdk-17-jre lsof dos2unix procps unzip dumb-init \
++  && DEBIAN_FRONTEND=noninteractive apt-get install -y openjdk-17-jre-headless lsof dos2unix procps unzip dumb-init \
 +  && dpkg --compare-versions "$(dpkg-query -W -f='${Version}' openjdk-17-jre-headless)" ge '17.0.21.1+2-1~22.04.1' \
 +  && mkdir -p "$(dirname "$JAVA_HOME")" \
 +  && ln -s "$(dirname "$(dirname "$(readlink -f /usr/bin/java)")")" "$JAVA_HOME" \
@@ -75,14 +90,15 @@ diff --git a/docker/src/main/Dockerfile-1.0.0-confignode b/docker/src/main/Docke
 diff --git a/docker/src/main/Dockerfile-1.0.0-datanode b/docker/src/main/Dockerfile-1.0.0-datanode
 --- a/docker/src/main/Dockerfile-1.0.0-datanode
 +++ b/docker/src/main/Dockerfile-1.0.0-datanode
-@@ -16,15 +16,19 @@
+@@ -16,21 +16,24 @@
  # specific language governing permissions and limitations
  # under the License.
  #
 -FROM eclipse-temurin:17-jre-focal
 +FROM ubuntu:22.04
  ARG version=1.0.0
- ARG target=apache-iotdb-${version}-datanode-bin
+-ARG target=apache-iotdb-${version}-datanode-bin
++ARG target=apache-iotdb-${version}-all-bin
 +ENV JAVA_HOME=/opt/java/openjdk LANG=C.UTF-8
 
 -RUN apt update \
@@ -92,7 +108,7 @@ diff --git a/docker/src/main/Dockerfile-1.0.0-datanode b/docker/src/main/Dockerf
 -  && apt clean -y
 +# Require the first Jammy OpenJDK 17 update that fixes CVE-2026-114938.
 +RUN apt-get update \
-+  && DEBIAN_FRONTEND=noninteractive apt-get install -y openjdk-17-jre lsof dos2unix procps unzip dumb-init wget inetutils-ping \
++  && DEBIAN_FRONTEND=noninteractive apt-get install -y openjdk-17-jre-headless lsof dos2unix procps unzip dumb-init wget inetutils-ping \
 +  && dpkg --compare-versions "$(dpkg-query -W -f='${Version}' openjdk-17-jre-headless)" ge '17.0.21.1+2-1~22.04.1' \
 +  && mkdir -p "$(dirname "$JAVA_HOME")" \
 +  && ln -s "$(dirname "$(dirname "$(readlink -f /usr/bin/java)")")" "$JAVA_HOME" \
@@ -101,6 +117,13 @@ diff --git a/docker/src/main/Dockerfile-1.0.0-datanode b/docker/src/main/Dockerf
 
  COPY target/${target}.zip /
  RUN cd / && unzip ${target}.zip \
+   && rm ${target}.zip \
+-#  && mv ${target} iotdb
+-  && mv apache-iotdb-${version}-server-bin iotdb
++  && mv ${target} iotdb
+
+ ENV IOTDB_HOME=/iotdb VERSION=${version}
+ WORKDIR ${IOTDB_HOME}/sbin
 diff --git a/docker/src/main/Dockerfile-1.0.0-standalone b/docker/src/main/Dockerfile-1.0.0-standalone
 --- a/docker/src/main/Dockerfile-1.0.0-standalone
 +++ b/docker/src/main/Dockerfile-1.0.0-standalone
@@ -121,7 +144,7 @@ diff --git a/docker/src/main/Dockerfile-1.0.0-standalone b/docker/src/main/Docke
 -  && apt clean -y
 +# Require the first Jammy OpenJDK 17 update that fixes CVE-2026-114938.
 +RUN apt-get update \
-+  && DEBIAN_FRONTEND=noninteractive apt-get install -y openjdk-17-jre lsof dos2unix procps unzip dumb-init \
++  && DEBIAN_FRONTEND=noninteractive apt-get install -y openjdk-17-jre-headless lsof dos2unix procps unzip dumb-init \
 +  && dpkg --compare-versions "$(dpkg-query -W -f='${Version}' openjdk-17-jre-headless)" ge '17.0.21.1+2-1~22.04.1' \
 +  && mkdir -p "$(dirname "$JAVA_HOME")" \
 +  && ln -s "$(dirname "$(dirname "$(readlink -f /usr/bin/java)")")" "$JAVA_HOME" \
