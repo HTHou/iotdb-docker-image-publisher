@@ -9,6 +9,8 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
+    env:
+      IOTDB_VERSION: '2.0.12'
 
     steps:
       - name: Check out publisher
@@ -20,21 +22,28 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       
-      - name: Make package
-        run: | 
-          git clone https://github.com/apache/iotdb.git
+      - name: Build and publish Docker images
+        run: |
+          git clone --depth 1 --branch "v${IOTDB_VERSION}" https://github.com/apache/iotdb.git
           cd iotdb
-          git checkout v2.0.11
           git apply "$GITHUB_WORKSPACE/.github/patches/iotdb-2.0.11-java4shell.patch"
           cd docker/src/main
           mkdir target
           cd target
-          wget https://dlcdn.apache.org/iotdb/2.0.11/apache-iotdb-2.0.11-all-bin.zip
+          archive="apache-iotdb-${IOTDB_VERSION}-all-bin.zip"
+          release_url="https://downloads.apache.org/iotdb/${IOTDB_VERSION}/${archive}"
+          wget "$release_url"
+          archive_sha512=$(wget -qO - "${release_url}.sha512")
+          printf '%s  %s\n' "$archive_sha512" "$archive" | sha512sum --check --strict
           cd ../DockerCompose
           sed -i 's/ docker run --rm --privileged tonistiigi/# docker run --rm --privileged tonistiigi/' do-docker-build.sh
-          ./do-docker-build.sh -t confignode -v 2.0.11 -p
-          ./do-docker-build.sh -t datanode -v 2.0.11 -p
-          ./do-docker-build.sh -t standalone -v 2.0.11 -p
-          ./do-docker-build.sh -t latest -v 2.0.11 -p
-          
+          ./do-docker-build.sh -t confignode -v "$IOTDB_VERSION" -p
+          ./do-docker-build.sh -t datanode -v "$IOTDB_VERSION" -p
+          ./do-docker-build.sh -t standalone -v "$IOTDB_VERSION" -p
+          ./do-docker-build.sh -t latest -v "$IOTDB_VERSION" -p
 
+      - name: Verify published tags
+        run: |
+          for tag in "${IOTDB_VERSION}-confignode" "${IOTDB_VERSION}-datanode" "${IOTDB_VERSION}-standalone" latest; do
+            docker buildx imagetools inspect "apache/iotdb:${tag}"
+          done
